@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import get_canvas_width, load_image
 
 import game_framework
 from boy import RUN_SPEED_MPS, PIXEL_PER_METER
@@ -27,9 +27,20 @@ class Bird:
         self.dir = 1
 
     def update(self):
-        self.frame = (self.frame + FRAMES_PER_SECOND * game_framework.frame_time) % len(FRAME_RECTS)
-        self.x += self.dir * BIRD_SPEED_PPS * game_framework.frame_time
+        dt = game_framework.frame_time
+        if dt == 0:
+            return
+        self.frame = (self.frame + FRAMES_PER_SECOND * dt) % len(FRAME_RECTS)
+        left = self.width / 2
+        span = get_canvas_width() - self.width
+        # 왕복 경로를 펼쳐 이동한 뒤 접으면 경계 초과 거리도 보존된다.
+        phase = self.x - left if self.dir == 1 else 2 * span - (self.x - left)
+        phase = (phase + BIRD_SPEED_PPS * dt) % (2 * span)
+        self.x = left + min(phase, 2 * span - phase)
+        self.dir = 1 if phase < span else -1
 
     def draw(self):
-        self.image.clip_draw(*FRAME_RECTS[int(self.frame)],
-                             self.x, self.y, self.width, self.height)
+        flip = 'h' if self.dir == -1 else ''
+        self.image.clip_composite_draw(*FRAME_RECTS[int(self.frame)],
+                                       0, flip, self.x, self.y,
+                                       self.width, self.height)
