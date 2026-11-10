@@ -31,7 +31,10 @@ def init():
     grass = Grass()
     game_world.add_oject(grass, 0)
 
-    game_world.add_oject(Bird(400, 300))
+    for i in range(10):
+        x = Bird.width / 2 + (get_canvas_width() - Bird.width) * (i + 0.5) / 10
+        y = 160 + (get_canvas_height() - Bird.height / 2 - 160) * i / 9
+        game_world.add_oject(Bird(x, y))
 
 
 def pause():
