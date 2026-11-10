@@ -3,7 +3,7 @@ import game_world
 import game_framework
 from boy import Boy
 from grass import Grass
-from bird import Bird
+from bird import Bird, FRAME_RECTS
 
 boy = None
 
@@ -34,7 +34,9 @@ def init():
     for i in range(10):
         x = Bird.width / 2 + (get_canvas_width() - Bird.width) * (i + 0.5) / 10
         y = 160 + (get_canvas_height() - Bird.height / 2 - 160) * i / 9
-        game_world.add_oject(Bird(x, y))
+        direction = 1 if i % 2 == 0 else -1
+        frame = i * len(FRAME_RECTS) / 10
+        game_world.add_oject(Bird(x, y, direction, frame))
 
 
 def pause():
